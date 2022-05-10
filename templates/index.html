@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>KenKen</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' type='text/css' href='/static/css/index.css' />
+</head>
+
+<body>
+    <p>
+        <div style="display: flex; justify-content: center;">
+            <h3>
+                <p style="font-size: 2rem;"> KenKen Game</p>
+            </h3>
+        </div>
+    </p>
+    <div id="controls" class="no-print">
+        Size: <input id="size" type="number">
+        <button id="generate">Generate</button> <br /> <br />
+        <input type="radio" id="BT" name="algorithm" value="BT">
+        <label for="BT">BackTracking</label> <br />
+        <input type="radio" id="FC" name="algorithm" value="FC">
+        <label for="FC">BackTracking with Forward Chacking</label> <br />
+        <input type="radio" id="AC3" name="algorithm" value="AC3">
+        <label for="AC3">BackTracking with Forward Chacking and arc consistency</label> <br />
+        <button id="solve">Solve</button>
+
+    </div>
+    <div>
+        <div id="board">
+        </div>
+    </div>
+</body>
+
+</html>

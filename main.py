@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, render_template, request
 import kenken
 
 app = Flask(__name__)
@@ -16,5 +16,9 @@ def generate():
         print(clique)
     
     return {'board': cliques}
+
+@app.get('/')
+def index():
+    return render_template('index.html')
 
 app.run(debug=True)
