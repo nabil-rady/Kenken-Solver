@@ -1,5 +1,6 @@
 from functools import reduce
 import random
+import solution
 from itertools import product, permutations
 
 def operation(operator):
@@ -123,3 +124,47 @@ def generate_domains(size, cages):
 
     return domains
 
+# True if cage values could cause conflict
+def probable_conflict_of_neighbours(cage_1, cage_2):
+    for cell_1 in cage_1:
+        for cell_2 in cage_2:
+            if row_or_col_same(cell_1, cell_2):
+                return True
+    return False
+
+def generate_neighbors(cages):
+    # Generate all neigbhours to all cages
+    neighbors = {}
+    for members, _, _ in cages:
+        neighbors[members] = []
+
+    for cage_1, _, _ in cages:
+        for cage_2, _, _ in cages:
+            if cage_1 != cage_2 and cage_2 not in neighbors[cage_1]:
+                if probable_conflict_of_neighbours(cage_1, cage_2):
+                    neighbors[cage_1].append(cage_2)
+                    neighbors[cage_2].append(cage_1)
+
+    return neighbors
+
+class Kenken(solution.Solution):
+    def __init__(self, size, cages):    
+        vars = [cage_cell for cage_cell, _, _ in cages]
+
+        domains = generate_domains(size, cages)
+
+        neighbors = generate_neighbors(cages)
+
+        solution.Solution.__init__(self, vars, domains, neighbors, self.neighbours_constraints)
+
+        self.size = size
+
+    # True if no conflict between two cages.
+    def neighbours_constraints(self, cage_1, values_of_cage_1, cage_2, values_of_cage_2):
+        if cage_1 == cage_2:
+            return True
+        for cell_1, value_in_cage_1 in zip(cage_1, values_of_cage_1):
+            for cell_2, value_in_cage_2 in zip(cage_2,  values_of_cage_2):
+                if row_or_col_same(cell_1, cell_2) and value_in_cage_1 == value_in_cage_2:
+                    return False
+        return True

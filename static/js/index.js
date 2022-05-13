@@ -112,3 +112,55 @@ const getBoard = async (size) => {
 }
 
 document.querySelector('#generate').addEventListener('click', () => printBoard(document.getElementById('size').value));
+
+const getBT = async() => {
+    let board = await fetch('http://localhost:5000/bt', {
+        method: 'GET',
+    });
+
+    board = await board.json();
+    return board.BT;
+}
+
+async function solve (i_BoardSize) {
+    const BT = await getBT();
+    const inputData = document.getElementsByName('algorithm');
+    let algorithmArr = [];
+    let algorithm = '';
+    for(i = 0; i < inputData.length; i++) {
+        if(inputData[i].checked)
+            algorithm = inputData[i]
+    }
+    switch(algorithm.value) {
+        case 'BT':
+            algorithmArr = BT;
+            break;  
+    }
+    for (let x = 0; x < i_BoardSize; ++x) {
+        for (let y = 0; y < i_BoardSize; ++y) {
+            let tableData = document.querySelector(`#x${x+1}y${y+1}`);
+            let index = tableData.innerHTML.search('<div')
+            if(index===-1)
+            {
+                tableData.innerHTML=''
+            }
+            else {
+                tableData.innerHTML=''+tableData.innerHTML.substring(index,tableData.length)
+            }
+            for(let i=0;i<algorithmArr.length;i++)
+            {
+                for(let j=0; j<algorithmArr[i][0].length;j++)
+                {
+                    console.log()
+                    if(algorithmArr[i][0][j][0]=== x+1 && algorithmArr[i][0][j][1]===y+1)
+                    {
+                        tableData.innerHTML = algorithmArr[i][1][j]+tableData.innerHTML
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+document.querySelector('#solve').addEventListener('click', () => solve(document.getElementById('size').value));
