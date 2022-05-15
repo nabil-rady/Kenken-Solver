@@ -28,10 +28,22 @@ def bt():
     
     assignment = solution.backtracking_search(ken)
     assignment = list(assignment.items())
-    BT = {'BT': assignment}
+    BT = {'solution': assignment}
     print('BT: ')
     print(assignment)
     return BT
+
+@app.route('/fc', methods=['GET'])
+def fc():
+    global size, cages
+    ken = kenken.Kenken(size, cages)
+    
+    assignment = solution.backtracking_search(ken, inference_method=solution.forward_checking)
+    assignment = list(assignment.items())
+    FC = {'solution': assignment}
+    print('FC: ')
+    print(assignment)
+    return FC
 
 @app.get('/')
 def index():

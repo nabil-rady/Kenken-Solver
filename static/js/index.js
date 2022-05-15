@@ -113,29 +113,28 @@ const getBoard = async (size) => {
 
 document.querySelector('#generate').addEventListener('click', () => printBoard(document.getElementById('size').value));
 
-const getBT = async() => {
-    let board = await fetch('http://localhost:5000/bt', {
+const getSolution = async (algo) => {
+    if(algo !== 'bt' && algo !== 'fc' && algo !== 'ac3')
+        throw new Error('Incorrect algorithm string.')
+    let board = await fetch(`http://localhost:5000/${algo}`, {
         method: 'GET',
     });
 
     board = await board.json();
-    return board.BT;
+    return board.solution;
 }
 
-async function solve (i_BoardSize) {
-    const BT = await getBT();
+async function solve(i_BoardSize) {
     const inputData = document.getElementsByName('algorithm');
-    let algorithmArr = [];
     let algorithm = '';
     for(i = 0; i < inputData.length; i++) {
-        if(inputData[i].checked)
-            algorithm = inputData[i]
+        if(inputData[i].checked){
+            algorithm = inputData[i];
+            break;
+        }
     }
-    switch(algorithm.value) {
-        case 'BT':
-            algorithmArr = BT;
-            break;  
-    }
+    console.log(algorithm.value)
+    const solution = await getSolution(algorithm.value);
     for (let x = 0; x < i_BoardSize; ++x) {
         for (let y = 0; y < i_BoardSize; ++y) {
             let tableData = document.querySelector(`#x${x+1}y${y+1}`);
@@ -147,14 +146,14 @@ async function solve (i_BoardSize) {
             else {
                 tableData.innerHTML=''+tableData.innerHTML.substring(index,tableData.length)
             }
-            for(let i=0;i<algorithmArr.length;i++)
+            for(let i=0;i<solution.length;i++)
             {
-                for(let j=0; j<algorithmArr[i][0].length;j++)
+                for(let j=0; j<solution[i][0].length;j++)
                 {
                     console.log()
-                    if(algorithmArr[i][0][j][0]=== x+1 && algorithmArr[i][0][j][1]===y+1)
+                    if(solution[i][0][j][0]=== x+1 && solution[i][0][j][1]===y+1)
                     {
-                        tableData.innerHTML = algorithmArr[i][1][j]+tableData.innerHTML
+                        tableData.innerHTML = solution[i][1][j]+tableData.innerHTML
                     }
 
                 }
