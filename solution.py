@@ -1,12 +1,15 @@
-from typing import Callable, Union, Any, Optional
+from collections import deque
+from typing import Any, Callable, Optional
 
 class Solution:
-    def __init__(self, vars: dict, domains: dict, neighbors: dict, constraints: Callable):
+    def __init__(self, vars: dict, domains: dict, neighbors: dict):
         self.vars = vars
         self.domains = domains
         self.neighbors = neighbors
-        self.constraints = constraints
         self.current_domains = None
+
+    def constraints(self, *args, **kwargs):
+        raise NotImplementedError
 
     def get_domain(self, var):
         return (self.current_domains or self.domains)[var]
@@ -57,9 +60,33 @@ def forward_checking(sol: Solution, var, value, assignment, removals):
                 return False
     return True
 
+def ac3(sol: Solution, queue, removals):
+    sol.copy_domains()
+    while queue:
+        (Xi, Xj) = queue.pop()
+        if remove_inconsistent_values(sol, Xi, Xj, removals):
+            if not sol.current_domains[Xi]:
+                return False
+            for Xk in sol.neighbors[Xi]:
+                if Xk != Xj:
+                    queue.append((Xk, Xi))
+    return True
+
+
+def remove_inconsistent_values(sol: Solution, Xi, Xj, removals):
+    removed = False
+    for x in sol.current_domains[Xi][:]:
+        if all(not sol.constraints(Xi, x, Xj, y) for y in sol.current_domains[Xj]):
+            sol.prune(Xi, x, removals)
+            removed = True
+    return removed
+
+def forward_checking_and_ac3(sol: Solution, var, value, assignment, removals):
+    return forward_checking(sol, var, value, assignment, removals) and ac3(sol, deque([(X, var) for X in sol.neighbors[var]]), removals)
+
 def backtracking_search(sol: Solution,
                         select_unassigned_variable=first_unassigned_variable,
-                        inference_method: Optional[Callable[[Solution, dict, Any, dict, dict], bool]]=None):
+                        inference_method: Optional[Callable[[Solution, dict, Any, dict], bool]]=None):
     def backtrack(assignment):
         if len(assignment) == len(sol.vars):
             return assignment
@@ -80,4 +107,3 @@ def backtracking_search(sol: Solution,
 
     result = backtrack({})
     return result
-

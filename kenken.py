@@ -155,12 +155,12 @@ class Kenken(solution.Solution):
 
         neighbors = generate_neighbors(cages)
 
-        solution.Solution.__init__(self, vars, domains, neighbors, self.neighbours_constraints)
+        super().__init__(vars, domains, neighbors)
 
         self.size = size
 
     # True if no conflict between two cages.
-    def neighbours_constraints(self, cage_1, values_of_cage_1, cage_2, values_of_cage_2):
+    def constraints(self, cage_1, values_of_cage_1, cage_2, values_of_cage_2):
         if cage_1 == cage_2:
             return True
         for cell_1, value_in_cage_1 in zip(cage_1, values_of_cage_1):

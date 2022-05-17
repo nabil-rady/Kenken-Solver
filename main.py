@@ -45,6 +45,18 @@ def fc():
     print(assignment)
     return FC
 
+@app.route('/ac3', methods=['GET'])
+def ac3():
+    global size, cages
+    ken = kenken.Kenken(size, cages)
+    
+    assignment = solution.backtracking_search(ken, inference_method=solution.forward_checking_and_ac3)
+    assignment = list(assignment.items())
+    AC3 = {'solution': assignment}
+    print('AC3: ')
+    print(assignment)
+    return AC3
+
 @app.get('/')
 def index():
     return render_template('index.html')
