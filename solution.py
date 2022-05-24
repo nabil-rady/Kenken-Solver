@@ -81,8 +81,8 @@ def remove_inconsistent_values(sol: Solution, Xi, Xj, removals):
             removed = True
     return removed
 
-def forward_checking_and_ac3(sol: Solution, var, value, assignment, removals):
-    return forward_checking(sol, var, value, assignment, removals) and ac3(sol, deque([(X, var) for X in sol.neighbors[var]]), removals)
+def apply_ac3(sol: Solution, var, value, assignment, removals):
+    return ac3(sol, deque([(X, var) for X in sol.neighbors[var]]), removals)
 
 def backtracking_search(sol: Solution,
                         select_unassigned_variable=first_unassigned_variable,

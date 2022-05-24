@@ -7,6 +7,7 @@ app = Flask(__name__)
 cages = None
 size = None
 
+
 @app.route('/generate', methods=['POST'])
 def generate():
     global cages
@@ -50,7 +51,7 @@ def ac3():
     global size, cages
     ken = kenken.Kenken(size, cages)
     
-    assignment = solution.backtracking_search(ken, inference_method=solution.forward_checking_and_ac3)
+    assignment = solution.backtracking_search(ken, inference_method=solution.apply_ac3)
     assignment = list(assignment.items())
     AC3 = {'solution': assignment}
     print('AC3: ')

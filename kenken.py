@@ -2,6 +2,8 @@ from functools import reduce
 import random
 import solution
 from itertools import product, permutations
+from time import perf_counter
+from csv import writer
 
 def operation(operator):
     if operator == '+':
@@ -168,3 +170,102 @@ class Kenken(solution.Solution):
                 if row_or_col_same(cell_1, cell_2) and value_in_cage_1 == value_in_cage_2:
                     return False
         return True
+
+def run_algorithm(kenken, algorithm):
+
+        start_time = perf_counter()
+
+        assignment = algorithm(kenken)
+
+        completion_time = perf_counter() - start_time
+
+        return assignment, round(completion_time, 3)
+
+def evaluate(num_of_boards, out):
+    
+    bt         = lambda ken: solution.backtracking_search(ken)
+    bt_fc         = lambda ken: solution.backtracking_search(ken, inference_method=solution.forward_checking)
+    bt_arc     = lambda ken: solution.backtracking_search(ken, inference_method=solution.apply_ac3)
+    
+
+    algorithms = {
+        "BT": bt,
+        "BT+FC": bt_fc,
+        "BT+ARC": bt_arc
+    }
+
+    with open(out, "w+") as file:
+
+        out = writer(file)
+
+        out.writerow(["Algorithm", "Size", "Average time"])
+
+        for board_size in range(5, 10):
+
+            avg_time_bt = 0
+
+            avg_time_bt_fc = 0
+
+            avg_time_bt_arc = 0
+
+            
+            for board_num in range(1, num_of_boards + 1):
+
+                    
+                cages = generate(board_size)
+                
+                for algorithm_name, algorithm in algorithms.items():
+
+                    if algorithm_name == 'BT' and board_size > 7:
+                        continue
+
+                    assignment, completion_time = run_algorithm(Kenken(board_size, cages), algorithm)
+
+                    print("Algorithm =",  algorithm_name, "Size =", board_size, "Board number =", board_num, "Completion_time =", completion_time , "Result =", "Success" if assignment else "Failure")
+
+                    if algorithm_name == "BT":
+
+                        avg_time_bt += completion_time
+
+                    elif algorithm_name == "BT+FC":
+
+                        avg_time_bt_fc += completion_time
+
+                    elif algorithm_name == "BT+ARC":
+
+                        avg_time_bt_arc += completion_time    
+                    
+
+            avg_time_bt /= num_of_boards
+
+            avg_time_bt_fc /= num_of_boards
+
+            avg_time_bt_arc /= num_of_boards
+
+            avg_time_bt = round(avg_time_bt, 3)
+
+            avg_time_bt_fc = round(avg_time_bt_fc, 3)
+
+            avg_time_bt_arc = round(avg_time_bt_arc, 3)
+
+            for algorithm_name, algorithm in algorithms.items():
+
+                if algorithm_name == "BT" and board_size < 8:
+
+                    out.writerow([algorithm_name, board_size, avg_time_bt])
+
+                elif algorithm_name == "BT+FC":
+
+                    out.writerow([algorithm_name, board_size, avg_time_bt_fc])
+
+                elif algorithm_name == "BT+ARC":
+
+                    out.writerow([algorithm_name, board_size, avg_time_bt_arc])
+
+            if board_size < 8:
+
+                print("Average time for backtracking algorithm to run for board size = ", board_size , " is " , avg_time_bt , "seconds")
+
+            print("Average time for backtracking with forward checking algorithm to run for board size = ", board_size , " is " , avg_time_bt_fc , "seconds")
+
+            print("Average time for backtracking with arc consistency algorithm to run for board size = ", board_size , " is " , avg_time_bt_arc , "seconds")
